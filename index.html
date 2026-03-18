@@ -1,1 +1,890 @@
-<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=cowork-setup-guide.html"><title>Claude Cowork Setup Guide</title></head><body><p><a href="cowork-setup-guide.html">Click here</a> if not redirected automatically.</p></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Claude Cowork — Setup Guide</title>
+  <style>
+    :root {
+      --brand: #d97757;
+      --brand-light: #f5ede8;
+      --brand-dark: #b85f3e;
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --border: #e8e6e1;
+      --text: #1a1a18;
+      --muted: #6b6b66;
+      --success: #2e7d5e;
+      --success-bg: #eaf5f0;
+      --step-inactive: #d1cfc8;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #2c2c28 0%, #1a1a16 100%);
+      color: white;
+      padding: 56px 24px 48px;
+      text-align: center;
+    }
+    .header-badge {
+      display: inline-block;
+      background: rgba(217,119,87,0.25);
+      color: var(--brand);
+      border: 1px solid rgba(217,119,87,0.4);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      margin-bottom: 18px;
+    }
+    header h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    header h1 span { color: var(--brand); }
+    header p {
+      color: rgba(255,255,255,0.65);
+      font-size: 16px;
+      max-width: 520px;
+      margin: 0 auto 28px;
+    }
+    .req-pills {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .req-pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .req-pill svg { opacity: 0.7; }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    }
+    .progress-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 0;
+    }
+    .progress-inner::-webkit-scrollbar { display: none; }
+    .prog-step {
+      flex: 1;
+      min-width: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      gap: 4px;
+    }
+    .prog-step:hover { color: var(--brand); border-bottom-color: var(--brand-light); }
+    .prog-step.active { color: var(--brand); border-bottom-color: var(--brand); }
+    .prog-step .dot {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--step-inactive);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+    .prog-step.active .dot { background: var(--brand); }
+    .prog-step.done .dot { background: var(--success); }
+    .prog-step.done { color: var(--success); }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── STEP CARDS ── */
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.2s;
+    }
+    .step-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 22px 24px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .step-num {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-card.prereq .step-num { background: #5b5bd6; }
+    .step-title-wrap { flex: 1; }
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--brand);
+      margin-bottom: 2px;
+    }
+    .step-card.prereq .step-label { color: #5b5bd6; }
+    .step-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .chevron {
+      width: 22px; height: 22px;
+      color: var(--muted);
+      transition: transform 0.25s;
+      flex-shrink: 0;
+    }
+    .step-card.open .chevron { transform: rotate(180deg); }
+
+    .step-body {
+      display: none;
+      padding: 0 24px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .step-card.open .step-body { display: block; }
+
+    /* ── CHECKLIST ── */
+    .checklist { list-style: none; margin-top: 16px; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14.5px;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .check-box {
+      width: 22px; height: 22px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      background: var(--surface);
+    }
+    .check-box:hover { border-color: var(--brand); }
+    .checklist li.done .check-box {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+    .checklist li.done .check-box::after {
+      content: '';
+      width: 5px; height: 9px;
+      border: 2px solid white;
+      border-top: none; border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+      display: block;
+    }
+    .checklist li.done .check-text { text-decoration: line-through; color: var(--muted); }
+    .check-text { flex: 1; }
+    .check-text strong { font-weight: 600; }
+    .check-text a { color: var(--brand); text-decoration: none; }
+    .check-text a:hover { text-decoration: underline; }
+
+    /* ── TIPS / CALLOUTS ── */
+    .tip {
+      background: #f0f4ff;
+      border: 1px solid #c7d3f8;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 16px;
+      font-size: 13.5px;
+      color: #3a4a8a;
+      display: flex;
+      gap: 10px;
+    }
+    .tip.warning {
+      background: #fff8ed;
+      border-color: #f5d78a;
+      color: #7a5a10;
+    }
+    .tip.success {
+      background: var(--success-bg);
+      border-color: #a8dcc5;
+      color: #1e5c40;
+    }
+    .tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── SUB STEPS ── */
+    .sub-steps { margin-top: 16px; }
+    .sub-step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+    .sub-num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--brand-light);
+      color: var(--brand-dark);
+      font-weight: 700;
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .sub-content { flex: 1; font-size: 14.5px; }
+    .sub-content strong { font-weight: 600; display: block; margin-bottom: 2px; }
+    .sub-content span { color: var(--muted); font-size: 13.5px; }
+
+    /* ── PLUGIN GRID ── */
+    .plugin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .plugin-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      color: var(--muted);
+      transition: all 0.15s;
+      cursor: default;
+    }
+    .plugin-chip:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    /* ── DIVIDER LABEL ── */
+    .divider-label {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .divider-label::before, .divider-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── SOURCES ── */
+    .sources {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-top: 32px;
+    }
+    .sources h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .sources ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+    .sources a {
+      color: var(--brand);
+      font-size: 13px;
+      text-decoration: none;
+      background: var(--brand-light);
+      border: 1px solid rgba(217,119,87,0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+    .sources a:hover { background: #ecd8cf; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 12.5px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .prog-step span { display: none; }
+      header { padding: 40px 16px 36px; }
+      main { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-badge">Getting Started Guide</div>
+  <h1>Get Started with <span>Claude Cowork</span></h1>
+  <p>Your complete step-by-step setup — from download to your first automated task.</p>
+  <div class="req-pills">
+    <div class="req-pill">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Paid Plan Required
+    </div>
+    <div class="req-pill">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Mac (macOS 11+) or Windows 10+
+    </div>
+    <div class="req-pill">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+      Google Chrome or Edge
+    </div>
+  </div>
+</header>
+
+<!-- ── STICKY PROGRESS ── -->
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <a class="prog-step active" href="#step-pre" onclick="setActive(this)">
+      <div class="dot">✓</div><span>Before You Begin</span>
+    </a>
+    <a class="prog-step" href="#step-1" onclick="setActive(this)">
+      <div class="dot">1</div><span>Download</span>
+    </a>
+    <a class="prog-step" href="#step-2" onclick="setActive(this)">
+      <div class="dot">2</div><span>Sign In</span>
+    </a>
+    <a class="prog-step" href="#step-3" onclick="setActive(this)">
+      <div class="dot">3</div><span>Chrome Extension</span>
+    </a>
+    <a class="prog-step" href="#step-4" onclick="setActive(this)">
+      <div class="dot">4</div><span>Connectors</span>
+    </a>
+    <a class="prog-step" href="#step-5" onclick="setActive(this)">
+      <div class="dot">5</div><span>Plugins</span>
+    </a>
+    <a class="prog-step" href="#step-6" onclick="setActive(this)">
+      <div class="dot">6</div><span>Tips</span>
+    </a>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- BEFORE YOU BEGIN -->
+  <div class="step-card prereq open" id="step-pre">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">✓</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Prerequisites</div>
+        <div class="step-title">Before You Begin</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <p style="margin-top:14px; color:var(--muted); font-size:14px;">Make sure you have all of the following before starting:</p>
+      <ul class="checklist">
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><strong>Paid Claude subscription</strong> — Pro, Max, Team, or Enterprise plan</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><strong>Compatible computer</strong> — Mac (macOS 11+) or Windows 10+</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><strong>Google Chrome or Microsoft Edge</strong> — required for the browser extension</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><strong>Stable internet connection</strong> — first launch downloads ~2GB of files</div>
+        </li>
+      </ul>
+      <div class="tip warning">
+        <span class="tip-icon">⚠️</span>
+        <span>Brave, Arc, and other Chromium-based browsers are <strong>not currently supported</strong> for the Claude in Chrome extension.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card" id="step-1">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">1</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Step 1</div>
+        <div class="step-title">Download & Install the Desktop App</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <ul class="checklist" style="margin-top:14px;">
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text">Go to <a href="https://claude.com/download" target="_blank">claude.com/download</a> and download the installer for your OS</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><strong>Mac:</strong> Open the .dmg file and drag Claude to your <em>Applications</em> folder</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><strong>Windows:</strong> Run the .exe installer and follow the prompts using the default path</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text">Launch Claude — it will download ~2GB of files on first boot. Wait for it to complete</div>
+        </li>
+      </ul>
+      <div class="tip">
+        <span class="tip-icon">💡</span>
+        <span>The installer itself is small (~7MB). The bulk of the download happens after launch, so keep the app open until setup finishes.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card" id="step-2">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">2</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Step 2</div>
+        <div class="step-title">Sign In & Open Cowork Mode</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <ul class="checklist" style="margin-top:14px;">
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text">Open the Claude Desktop app and sign in with your Claude or Google account</div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text">Configure your keyboard shortcut and menu bar launcher when prompted, then click <strong>Continue</strong></div>
+        </li>
+        <li onclick="checkItem(this)">
+          <div class="check-box"></div>
+          <div class="check-text">Click the <strong>Cowork</strong> tab at the top of the app to switch from chat into Cowork mode</div>
+        </li>
+      </ul>
+      <div class="tip success">
+        <span class="tip-icon">✅</span>
+        <span>You're now in Cowork mode. You can describe any multi-step task and Claude will begin planning and executing it autonomously.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card" id="step-3">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">3</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Step 3</div>
+        <div class="step-title">Connect the Chrome Browser Extension</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <p style="margin-top:14px; font-size:14px; color:var(--muted);">Pairing Cowork with <strong>Claude in Chrome</strong> lets Claude automate browser tasks — web navigation, form filling, data extraction — alongside your local files.</p>
+      <div class="sub-steps" style="margin-top:18px;">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Install the extension</strong>
+            <span>Go to <a href="https://claude.com/claude-for-chrome" target="_blank" style="color:var(--brand);">claude.com/claude-for-chrome</a> and click <em>"Add to Chrome"</em></span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Sign in to the extension</strong>
+            <span>Use the same Claude account credentials when prompted</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Pin the extension</strong>
+            <span>Click the puzzle piece 🧩 icon in Chrome → click the thumbtack next to <em>"Claude"</em></span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">4</div>
+          <div class="sub-content">
+            <strong>Enable in Desktop app</strong>
+            <span>Click your initials (lower left) → <em>Settings</em> → find <strong>Claude in Chrome</strong> → toggle it on</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">5</div>
+          <div class="sub-content">
+            <strong>Activate per conversation</strong>
+            <span>In any Cowork chat, use the <em>Connectors</em> dropdown to enable Claude in Chrome for that session</span>
+          </div>
+        </div>
+      </div>
+      <div class="tip warning">
+        <span class="tip-icon">⚠️</span>
+        <span>If the extension isn't detected after installing, <strong>restart Chrome</strong> so it picks up the native messaging configuration.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-card" id="step-4">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">4</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Step 4</div>
+        <div class="step-title">Add Connectors</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <p style="margin-top:14px; font-size:14px; color:var(--muted);">Connectors give Claude live access to your apps — Slack, Notion, Google Drive, Linear, and hundreds more.</p>
+      <div class="divider-label">Browse & Install</div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Open Connectors</strong>
+            <span>Click your initials → <em>Settings → Connectors → Browse Connectors</em></span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Choose your type</strong>
+            <span><em>Web</em> = browser-based APIs &nbsp;|&nbsp; <em>Desktop</em> = locally installed with deeper system access</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Authorize</strong>
+            <span>Click a service (e.g., Slack, Notion) and complete the OAuth authorization flow</span>
+          </div>
+        </div>
+      </div>
+      <div class="divider-label">Add a Custom Connector</div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Go to Customize → Connectors</strong>
+            <span>Click the <strong>"+"</strong> button</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Enter connector details</strong>
+            <span>Provide the connector name, URL, and optional OAuth credentials (Client ID + Secret)</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Click "Add" and connect</strong>
+            <span>Follow the same authorization flow as catalog connectors</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 — PLUGINS -->
+  <div class="step-card open" id="step-5">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">5</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Step 5 — Most Important</div>
+        <div class="step-title">Set Up Plugins</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <p style="margin-top:14px; font-size:14px; color:var(--muted);">Plugins bundle skills, connectors, and sub-agents into one package for your role. Instead of building from scratch, you get a ready-to-go Cowork environment in seconds.</p>
+
+      <div class="plugin-grid" style="margin-top:18px;">
+        <div class="plugin-chip">📣 Marketing</div>
+        <div class="plugin-chip">💰 Finance</div>
+        <div class="plugin-chip">⚖️ Legal</div>
+        <div class="plugin-chip">🛠 Engineering</div>
+        <div class="plugin-chip">🤝 Sales</div>
+        <div class="plugin-chip">🎨 Design</div>
+        <div class="plugin-chip">📊 Data</div>
+        <div class="plugin-chip">👥 HR / Ops</div>
+      </div>
+
+      <div class="divider-label">Install from the Library</div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Switch to Cowork mode</strong>
+            <span>Click the <em>Cowork</em> tab in the Claude Desktop app</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Open Customize</strong>
+            <span>Click <em>"Customize"</em> in the left sidebar — this brings together all your plugins, skills, and connectors</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Browse Plugins</strong>
+            <span>Click <em>"Browse Plugins"</em> to open the catalog modal</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">4</div>
+          <div class="sub-content">
+            <strong>Install your plugin</strong>
+            <span>Find the plugin that matches your role (e.g., Marketing) and click <em>"Install"</em></span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">5</div>
+          <div class="sub-content">
+            <strong>Use your new skills</strong>
+            <span>Type <strong>"/"</strong> or click <strong>"+"</strong> in any Cowork chat to see the skills your plugin unlocked</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-label">Customize an Installed Plugin</div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Go to Customize → Plugins</strong>
+            <span>Find your installed plugin in the list</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Click "Customize"</strong>
+            <span>Located in the upper right corner of the plugin card</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Chat with Claude</strong>
+            <span>A new Cowork task opens where Claude walks you through tailoring the plugin to your workflow, tone, and connected tools</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-label">Install a Custom / Shared Plugin</div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Go to Customize → Plugins</strong>
+            <span>Click <em>"Upload Plugin"</em></span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Select your .plugin file</strong>
+            <span>This could be shared by a colleague or downloaded from the <a href="https://github.com/anthropics/knowledge-work-plugins" target="_blank" style="color:var(--brand);">Anthropic GitHub repo</a></span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Follow setup prompts</strong>
+            <span>Connect any required services and you're ready to go</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-label">Build Your Own Plugin</div>
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-num">1</div>
+          <div class="sub-content">
+            <strong>Install "Plugin Creator"</strong>
+            <span>Find and install this built-in plugin from the Browse Plugins catalog</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">2</div>
+          <div class="sub-content">
+            <strong>Follow the guided flow</strong>
+            <span>Claude walks you through naming, selecting skills, and connecting the right services</span>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-num">3</div>
+          <div class="sub-content">
+            <strong>Share with your team</strong>
+            <span>Export as a <strong>.plugin</strong> file and share it — teammates install it in seconds with Upload Plugin</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip success">
+        <span class="tip-icon">✅</span>
+        <span><strong>Team/Enterprise admins:</strong> You can push plugins to all members via <em>Admin Settings → Manage Plugins</em> — no manual install needed per person.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step-card" id="step-6">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num">6</div>
+      <div class="step-title-wrap">
+        <div class="step-label">Step 6</div>
+        <div class="step-title">Tips for Best Results</div>
+      </div>
+      <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="step-body">
+      <ul class="checklist" style="margin-top:14px;">
+        <li>
+          <div class="check-box" style="border-color:var(--brand); background:var(--brand-light); cursor:default;"></div>
+          <div class="check-text"><strong>Be specific with task descriptions</strong> — the more context you provide, the better and faster Claude completes your task</div>
+        </li>
+        <li>
+          <div class="check-box" style="border-color:var(--brand); background:var(--brand-light); cursor:default;"></div>
+          <div class="check-text"><strong>Set standing instructions</strong> — go to Settings to specify your role, preferred tone, and output format so Claude applies them to every session automatically</div>
+        </li>
+        <li>
+          <div class="check-box" style="border-color:var(--brand); background:var(--brand-light); cursor:default;"></div>
+          <div class="check-text"><strong>Keep the app open</strong> — closing the Desktop app ends any active Cowork session in progress</div>
+        </li>
+        <li>
+          <div class="check-box" style="border-color:var(--brand); background:var(--brand-light); cursor:default;"></div>
+          <div class="check-text"><strong>Watch your usage</strong> — Cowork tasks consume more of your plan allocation than regular chat since they're multi-step and compute-intensive</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="sources">
+    <h3>Official Sources</h3>
+    <ul>
+      <li><a href="https://support.claude.com/en/articles/13345190-get-started-with-cowork" target="_blank">Get started with Cowork</a></li>
+      <li><a href="https://support.claude.com/en/articles/13837440-use-plugins-in-cowork" target="_blank">Use plugins in Cowork</a></li>
+      <li><a href="https://support.claude.com/en/articles/13837433-manage-cowork-plugins-for-your-organization" target="_blank">Manage plugins for your org</a></li>
+      <li><a href="https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities" target="_blank">Use connectors</a></li>
+      <li><a href="https://support.claude.com/en/articles/12012173-get-started-with-claude-in-chrome" target="_blank">Claude in Chrome setup</a></li>
+      <li><a href="https://github.com/anthropics/knowledge-work-plugins" target="_blank">Open-source plugins (GitHub)</a></li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  Generated for Cardinal Blue Marketing Team &nbsp;·&nbsp; Claude Cowork Setup Guide &nbsp;·&nbsp; March 2026
+</footer>
+
+<script>
+  function toggle(header) {
+    const card = header.closest('.step-card');
+    card.classList.toggle('open');
+  }
+
+  function checkItem(li) {
+    li.classList.toggle('done');
+  }
+
+  function setActive(link) {
+    document.querySelectorAll('.prog-step').forEach(s => s.classList.remove('active'));
+    link.classList.add('active');
+  }
+
+  // Highlight progress step on scroll
+  const sections = document.querySelectorAll('[id^="step-"]');
+  const progLinks = document.querySelectorAll('.prog-step');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        progLinks.forEach(l => {
+          l.classList.remove('active');
+          if (l.getAttribute('href') === '#' + id) l.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
